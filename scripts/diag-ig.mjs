@@ -9,16 +9,18 @@ for (const [env, id] of cases) {
   console.log(`\n===== ${env} (len ${tok?.length || 0}, prefix ${tok?.slice(0, 4)})`);
   if (!tok) continue;
   const t = encodeURIComponent(tok);
+  const F = 'https://graph.facebook.com/v23.0';
   const urls = {
-    fb_debug: `https://graph.facebook.com/v21.0/debug_token?input_token=${t}&access_token=${t}`,
-    fb_me: `https://graph.facebook.com/v21.0/me?fields=id,name&access_token=${t}`,
-    fb_perms: `https://graph.facebook.com/v21.0/me/permissions?access_token=${t}`,
-    fb_accounts: `https://graph.facebook.com/v21.0/me/accounts?fields=name,instagram_business_account&access_token=${t}`,
-    fb_id: `https://graph.facebook.com/v21.0/${id}?fields=id,username,followers_count&access_token=${t}`,
-    ig_me: `https://graph.instagram.com/v21.0/me?fields=user_id,username,followers_count&access_token=${t}`,
-    ig_id: `https://graph.instagram.com/v21.0/${id}?fields=id,username,followers_count&access_token=${t}`,
-    ig_v23_id: `https://graph.instagram.com/v23.0/${id}?fields=id,username,followers_count&access_token=${t}`,
-    fb_v23_id: `https://graph.facebook.com/v23.0/${id}?fields=id,username,followers_count&access_token=${t}`,
+    me_ig_accounts: `${F}/me/instagram_accounts?fields=id,username&access_token=${t}`,
+    me_assigned_pages: `${F}/me/assigned_pages?fields=id,name,instagram_business_account&access_token=${t}`,
+    me_businesses: `${F}/me/businesses?fields=id,name&access_token=${t}`,
+    me_fields: `${F}/me?fields=id,name,instagram_accounts{id,username},business&access_token=${t}`,
+    asset_milo: `${F}/1402000539654399?fields=id,username,followers_count&access_token=${t}`,
+    asset_milo2: `${F}/1402000539654399?access_token=${t}`,
+    asset_liora: `${F}/874690359071763?fields=id,username,followers_count&access_token=${t}`,
+    asset_liora2: `${F}/874690359071763?access_token=${t}`,
+    id_media: `${F}/${id}/media?fields=id&limit=1&access_token=${t}`,
+    id_plain: `${F}/${id}?access_token=${t}`,
   };
   for (const [k, u] of Object.entries(urls)) {
     try { const r = await fetch(u); const j = await r.json(); console.log(k, r.status, show(j)); }
