@@ -69,6 +69,33 @@ const xId = (url) => (String(url).match(/(?:x|twitter)\.com\/[^/]+\/status(?:es)
 const truthy = (v) => /^(o|y|yes|true|1|v|✓|✔|광고)$/i.test(String(v || '').trim());
 
 // ---------- Instagram ----------
+async function fetchByDiscovery(ch, t, via) {
+  const user = ch.instagram.handle;
+  const F = 'id,caption,media_type,media_product_type,thumbnail_url,permalink,timestamp,like_count,comments_count,view_count';
+  const media = [];
+  let after = '', info = null;
+  for (let n = 0; n < 30; n++) {
+    const m = after ? `media.after(${after}).limit(50){${F}}` : `media.limit(50){${F}}`;
+    const r = await getJSON(`${FB}/${via}?fields=business_discovery.username(${user}){username,followers_count,${m}}&access_token=${t}`);
+    const bd = r.business_discovery;
+    info ||= bd;
+    media.push(...(bd.media?.data || []));
+    after = bd.media?.paging?.cursors?.after;
+    if (!after || !bd.media?.paging?.next && (bd.media?.data || []).length < 50) break;
+  }
+  const videos = media.filter((m) => m.media_type === 'VIDEO');
+  log(`${ch.key}: @${info.username} 공개 정보로 영상 ${videos.length}개, 팔로워 ${info.followers_count}`);
+  return {
+    followers: info.followers_count ?? null,
+    username: info.username,
+    items: videos.map((m) => ({
+      id: `ig-${m.id}`, platform: 'instagram', channel: ch.key, url: m.permalink, code: igCode(m.permalink),
+      caption: m.caption || '', title: cleanTitle(m.caption), thumbSrc: m.thumbnail_url || null, video: null,
+      views: m.view_count ?? null, likes: m.like_count ?? null, date: m.timestamp,
+    })),
+  };
+}
+
 async function fetchInstagram(ch) {
   const acc = ch.instagram;
   const token = process.env[acc.tokenEnv];
@@ -87,7 +114,16 @@ async function fetchInstagram(ch) {
       node = (igs.find((a) => a.username?.toLowerCase() === acc.handle?.toLowerCase()) || igs[0])?.id;
     }
     if (!node) throw new Error('인스타 계정 ID를 찾지 못함 (config의 instagram.igUserId 필요)');
-    me = await getJSON(`${FB}/${node}?fields=id,username,followers_count&access_token=${t}`);
+    try {
+      me = await getJSON(`${FB}/${node}?fields=id,username,followers_count&access_token=${t}`);
+    } catch (e) {
+      // 직접 권한이 없으면, 같은 토큰으로 읽히는 다른 채널 계정을 통해 공개 정보(비즈니스 디스커버리)로 가져온다
+      const viaList = cfg.channels.map((c) => c.instagram?.igUserId).filter((id) => id && id !== node);
+      for (const via of viaList) {
+        try { return await fetchByDiscovery(ch, t, via); } catch {}
+      }
+      throw e;
+    }
   }
   const media = [];
   let url = `${base}/${node}/media?fields=id,caption,media_type,media_product_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count&limit=50&access_token=${t}`;

@@ -91,6 +91,7 @@ h1 { font-size: 24px; margin: 0; letter-spacing: -0.02em; }
 .stage video { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
 .fallback { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 14px; padding: 24px; text-align: center; color: var(--muted); font-size: 14px; }
 .fallback .ph { position: absolute; inset: 0; opacity: .35; }
+.fallback .embed { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
 .fallback p, .fallback a { position: relative; margin: 0; }
 .fallback a { padding: 10px 16px; border-radius: 999px; background: var(--text); color: var(--bg); font-weight: 700; }
 .pinfo { position: absolute; left: 0; right: 0; top: 0; padding: 16px 64px 40px 16px; background: linear-gradient(rgba(0, 0, 0, .7), transparent); pointer-events: none; }

@@ -195,6 +195,11 @@
       video.load();
       video.hidden = true;
       fb.hidden = false;
+      if (it.platform === 'instagram' && it.code) {
+        // 영상 파일 주소를 주지 않는 계정은 인스타 공식 임베드로 재생
+        fb.innerHTML = `<iframe class="embed" src="https://www.instagram.com/reel/${encodeURIComponent(it.code)}/embed/" allow="autoplay; encrypted-media; fullscreen" allowfullscreen scrolling="no" loading="eager"></iframe>`;
+        return;
+      }
       const msg = feed.demo ? '샘플 데이터라 영상이 없어요. 계정을 연결하면 여기서 바로 재생돼요.' : '이 영상은 원본에서 볼 수 있어요.';
       fb.innerHTML = `${thumb(it, '')}<p>${msg}</p>${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${it.platform === 'x' ? 'X' : '인스타그램'}에서 보기</a>` : ''}`;
     }
