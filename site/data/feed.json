@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-05T16:32:39.578Z",
+ "updatedAt": "2026-11-05T16:50:59.602Z",
  "contact": {
   "user": "pabguji",
   "domain": "gmail.com"
@@ -116,6 +116,36 @@
     "brand": "",
     "title": "",
     "views": null,
+    "hide": false
+   }
+  },
+  {
+   "id": "x-2117602251841909141",
+   "channel": "liora",
+   "platform": "x",
+   "url": "https://x.com/LioraSolveil/status/2117602251841909141?a=iA_NzV_RVS8txhX7R9k&s=20",
+   "title": "한국 숏폼 드라마 시장이 정말 커지고 있어요.",
+   "thumb": "thumbs/x-2117602251841909141.webp",
+   "video": "https://video.twimg.com/amplify_video/2117602008580657152/vid/avc1/1280x720/6eVDNy2G8PC6353f.mp4",
+   "views": 2655,
+   "aspect": 1.778,
+   "date": "2026-11-03T12:58:14.000Z",
+   "series": null,
+   "season": null,
+   "episode": null,
+   "ad": true,
+   "brand": "Plot Party",
+   "_ad": true,
+   "_mention": null,
+   "thumbSrc": "https://pbs.twimg.com/amplify_video_thumb/2117602008580657152/img/bC8g7zXOjI8PjD73.jpg",
+   "_sheet": {
+    "link": "https://x.com/LioraSolveil/status/2117602251841909141?a=iA_NzV_RVS8txhX7R9k&s=20",
+    "channel": "",
+    "series": "",
+    "ad": true,
+    "brand": "Plot Party",
+    "title": "",
+    "views": 2655,
     "hide": false
    }
   }
