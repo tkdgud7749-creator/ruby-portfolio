@@ -9,7 +9,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cfg = JSON.parse(await fs.readFile(path.join(ROOT, 'config.json'), 'utf8'));
 let failed = false;
 
-for (const acc of cfg.instagram || []) {
+for (const acc of (cfg.channels || []).map(c => c.instagram).filter(a => a?.tokenEnv)) {
   const token = process.env[acc.tokenEnv];
   if (!token) continue;
   const r = await fetch(`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${encodeURIComponent(token)}`);
