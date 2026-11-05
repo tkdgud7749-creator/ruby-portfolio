@@ -201,7 +201,7 @@ for (const ch of channels) {
 
   const fb = ch.facebook;
   if (fb?.pageId) {
-    let count = prevCount(ch.key, 'facebook');
+    let count = fb.followersManual ?? prevCount(ch.key, 'facebook');
     const token = process.env[fb.tokenEnv];
     if (token) {
       try {

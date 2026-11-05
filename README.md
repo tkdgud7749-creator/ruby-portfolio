@@ -42,7 +42,7 @@
 |---|---|
 | `IG_TOKEN_MAIN` | 메인 인스타 장기 토큰 (Meta 개발자 앱 → Instagram API → 토큰 생성) |
 | `IG_TOKEN_MILO` | milo_lunaworld 장기 토큰 |
-| `FB_PAGE_TOKEN_1`, `FB_PAGE_TOKEN_2` | 페이스북 페이지 2개의 토큰 (팔로워 수용, 선택) |
+| `FB_PAGE_TOKEN_2` | 밀로 페이스북 페이지 토큰 (팔로워 수용, 선택). 리오라는 개인 프로필(프로 모드)이라 API가 없어 `config.json`의 `facebook.followersManual`에 숫자를 직접 적습니다 |
 | `X_BEARER_TOKEN` | 선택. 없으면 `config.json`의 `x.followersManual`에 적은 숫자를 씁니다 |
 | `SHEET_CSV_URL` | 위에서 받은 구글 시트 CSV 주소 |
 | `GH_PAT` | 인스타 토큰 자동 갱신용 GitHub 개인 토큰 (Secrets 쓰기 권한) |
