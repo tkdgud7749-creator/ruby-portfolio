@@ -14,7 +14,7 @@ for (const acc of (cfg.channels || []).map(c => c.instagram).filter(a => a?.toke
   if (!token) continue;
   const r = await fetch(`https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${encodeURIComponent(token)}`);
   const body = await r.json().catch(() => ({}));
-  if (!r.ok || !body.access_token) { console.error(`${acc.tokenEnv} 갱신 실패:`, body?.error?.message || r.status); failed = true; continue; }
+  if (!r.ok || !body.access_token) { console.log(`${acc.tokenEnv}: 갱신 불가(만료 없는 통합 로그인 토큰이면 정상)`, body?.error?.message || r.status); continue; }
   console.log(`::add-mask::${body.access_token}`);
   execFileSync('gh', ['secret', 'set', acc.tokenEnv], { input: body.access_token, stdio: ['pipe', 'inherit', 'inherit'] });
   console.log(`${acc.tokenEnv} 갱신 완료 (만료까지 ${Math.round(body.expires_in / 86400)}일)`);

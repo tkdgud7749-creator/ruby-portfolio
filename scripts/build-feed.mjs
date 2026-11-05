@@ -74,14 +74,28 @@ async function fetchInstagram(ch) {
   const token = process.env[acc.tokenEnv];
   if (!token) { log(`${ch.key}: 인스타 토큰 없음(${acc.tokenEnv}) → 이전 데이터 유지`); return null; }
   const t = encodeURIComponent(token);
-  const me = await getJSON(`${IG}/me?fields=user_id,username,followers_count&access_token=${t}`);
+  // 인스타 로그인 토큰(graph.instagram.com)과 통합 로그인·시스템 사용자 토큰(graph.facebook.com) 모두 지원
+  let base = IG, node = 'me', me;
+  try {
+    me = await getJSON(`${IG}/me?fields=user_id,username,followers_count&access_token=${t}`);
+  } catch {
+    base = FB;
+    node = acc.igUserId;
+    if (!node) {
+      const acc2 = await getJSON(`${FB}/me/accounts?fields=instagram_business_account{id,username}&limit=100&access_token=${t}`);
+      const igs = (acc2.data || []).map((p) => p.instagram_business_account).filter(Boolean);
+      node = (igs.find((a) => a.username?.toLowerCase() === acc.handle?.toLowerCase()) || igs[0])?.id;
+    }
+    if (!node) throw new Error('인스타 계정 ID를 찾지 못함 (config의 instagram.igUserId 필요)');
+    me = await getJSON(`${FB}/${node}?fields=id,username,followers_count&access_token=${t}`);
+  }
   const media = [];
-  let url = `${IG}/me/media?fields=id,caption,media_type,media_product_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count&limit=50&access_token=${t}`;
+  let url = `${base}/${node}/media?fields=id,caption,media_type,media_product_type,media_url,thumbnail_url,permalink,timestamp,like_count,comments_count&limit=50&access_token=${t}`;
   while (url && media.length < 1000) { const page = await getJSON(url); media.push(...(page.data || [])); url = page.paging?.next; }
   const videos = media.filter((m) => m.media_type === 'VIDEO');
   await pool(videos, 4, async (m) => {
     try {
-      const ins = await getJSON(`${IG}/${m.id}/insights?metric=views&access_token=${t}`);
+      const ins = await getJSON(`${base}/${m.id}/insights?metric=views&access_token=${t}`);
       const d = ins.data?.[0];
       m.views = d?.total_value?.value ?? d?.values?.[0]?.value ?? null;
     } catch { m.views = null; }

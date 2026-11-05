@@ -24,7 +24,7 @@
       "name": "Milo&Luna",
       "tagline": "Milo & Luna World",
       "avatar": "",
-      "instagram": { "handle": "milo_lunaworld", "tokenEnv": "IG_TOKEN_MILO" },
+      "instagram": { "handle": "milo_lunaworld", "tokenEnv": "IG_TOKEN_MILO", "igUserId": "17841455144621523" },
       "facebook": { "pageId": "61594976046615", "url": "https://www.facebook.com/profile.php?id=61594976046615", "tokenEnv": "FB_PAGE_TOKEN_2" },
       "seriesOrder": [],
       "seriesKeywords": {}
