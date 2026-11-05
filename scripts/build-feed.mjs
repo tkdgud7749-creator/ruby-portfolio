@@ -55,7 +55,10 @@ function seriesFromTitle(title, ch) {
   for (const [name, kws] of Object.entries(ch?.seriesKeywords || {})) if (kws.some((k) => t.includes(norm(k)))) return name;
   // "새시리즈 Ep.01" 처럼 쓰면 새 시리즈가 자동으로 생긴다
   const m = String(title || '').match(/^\s*(.{1,30}?)[\s\-–:|]*(?:ep|episode)\s*\.?\s*\d+/i);
-  return m ? m[1].trim() : null;
+  if (m) return m[1].trim();
+  // 이름 없이 "EP.23 — ..." 로 시작하면 채널의 기본 시리즈로
+  if (ch?.episodeSeries && /^\s*(?:ep|episode)\s*\.?\s*\d+/i.test(String(title || ''))) return ch.episodeSeries;
+  return null;
 }
 function isAd(text) {
   const tags = (String(text || '').match(/#[\p{L}\p{N}_]+/gu) || []).map((h) => h.slice(1).toLowerCase());

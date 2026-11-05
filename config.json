@@ -14,7 +14,7 @@
       "x": { "handle": "LioraSolveil", "bearerEnv": "X_BEARER_TOKEN", "followersManual": null },
       "seriesOrder": ["묘한 이야기", "해리, 내 뒤에 있어", "UNCAGED"],
       "seriesKeywords": {
-        "묘한 이야기": ["묘한 이야기", "묘한이야기"],
+        "묘한 이야기": ["묘한 이야기", "묘한이야기", "묘~한 이야기", "묘~한이야기"],
         "해리, 내 뒤에 있어": ["해리, 내 뒤에 있어", "해리 내 뒤에 있어", "해리,내뒤에있어", "내 뒤에 있어"],
         "UNCAGED": ["UNCAGED"]
       }
@@ -26,8 +26,9 @@
       "avatar": "",
       "instagram": { "handle": "milo_lunaworld", "tokenEnv": "IG_TOKEN_MAIN", "igUserId": "17841455144621523" },
       "facebook": { "pageId": "61594976046615", "url": "https://www.facebook.com/profile.php?id=61594976046615", "tokenEnv": "FB_PAGE_TOKEN_2" },
-      "seriesOrder": [],
-      "seriesKeywords": {}
+      "seriesOrder": ["Milo&Luna"],
+      "seriesKeywords": {},
+      "episodeSeries": "Milo&Luna"
     }
   ],
 
