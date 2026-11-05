@@ -9,7 +9,7 @@
       "name": "Liora Solveil",
       "tagline": "AI Film Creator",
       "avatar": "",
-      "instagram": { "handle": "liorasolveil", "tokenEnv": "IG_TOKEN_MAIN" },
+      "instagram": { "handle": "liorasolveil", "tokenEnv": "IG_TOKEN_MAIN", "igUserId": "17841479912616934" },
       "facebook": { "pageId": "61594447989067", "url": "https://www.facebook.com/profile.php?id=61594447989067", "followersManual": null },
       "x": { "handle": "LioraSolveil", "bearerEnv": "X_BEARER_TOKEN", "followersManual": null },
       "seriesOrder": ["묘한 이야기", "해리, 내 뒤에 있어", "UNCAGED"],
