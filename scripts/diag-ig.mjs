@@ -10,7 +10,14 @@ for (const [env, id] of cases) {
   if (!tok) continue;
   const t = encodeURIComponent(tok);
   const F = 'https://graph.facebook.com/v23.0';
-  const urls = {
+  const urls = {};
+  for (const v of ['v24.0', 'v25.0', 'v26.0', 'v27.0']) urls[`ver_${v}`] = `https://graph.facebook.com/${v}/${id}?fields=id,username,followers_count&access_token=${t}`;
+  Object.assign(urls, {
+    me_all: `https://graph.facebook.com/v25.0/me?metadata=1&access_token=${t}`,
+    assigned_ig: `https://graph.facebook.com/v25.0/me/assigned_instagram_accounts?access_token=${t}`,
+    ig_users: `https://graph.facebook.com/v25.0/me/instagram_business_accounts?access_token=${t}`,
+  });
+  const _skip = {
     me_ig_accounts: `${F}/me/instagram_accounts?fields=id,username&access_token=${t}`,
     me_assigned_pages: `${F}/me/assigned_pages?fields=id,name,instagram_business_account&access_token=${t}`,
     me_businesses: `${F}/me/businesses?fields=id,name&access_token=${t}`,
@@ -23,7 +30,7 @@ for (const [env, id] of cases) {
     id_plain: `${F}/${id}?access_token=${t}`,
   };
   for (const [k, u] of Object.entries(urls)) {
-    try { const r = await fetch(u); const j = await r.json(); console.log(k, r.status, show(j)); }
+    try { const r = await fetch(u); const j = await r.json(); console.log('D', k, r.status, k === 'me_all' ? JSON.stringify(Object.keys(j.metadata?.connections || {})).slice(0, 1500) : show(j)); }
     catch (e) { console.log(k, 'ERR', e.message); }
   }
 }
