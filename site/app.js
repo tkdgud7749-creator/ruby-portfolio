@@ -182,6 +182,7 @@
     $('#pnext').disabled = i === list.length - 1;
 
     const fb = $('#fallback');
+    $('#stage').classList.toggle('emb', !it.video && it.platform === 'instagram' && !!it.code);
     if (it.video) {
       fb.hidden = true;
       video.hidden = false;
