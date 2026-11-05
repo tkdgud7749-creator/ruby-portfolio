@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Liora Solveil · AI Film Creator</title>
+<meta name="description" content="AI 영상 크리에이터 포트폴리오 — 작품, 시리즈, 광고 작업">
+<meta name="theme-color" content="#0b0b0d">
+<!-- X·인스타 영상 서버는 다른 사이트에서 온 요청(Referer)을 막으므로 보내지 않는다 -->
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <nav class="channels" id="channels" aria-label="계정 선택" hidden></nav>
+  <header class="top">
+    <div class="profile">
+      <div class="avatar" id="avatar">L</div>
+      <div>
+        <h1 id="name">Liora Solveil</h1>
+        <p class="tagline" id="tagline">AI Film Creator</p>
+      </div>
+    </div>
+    <a class="contact" id="contact" href="#">광고 문의</a>
+    <ul class="followers" id="followers"></ul>
+  </header>
+
+  <p class="demo" id="demo" hidden>샘플 데이터로 보여 주는 시안이에요. 계정을 연결하면 실제 영상으로 바뀝니다.</p>
+</div>
+
+<nav class="tabs" aria-label="보기 선택">
+  <div class="wrap tabs-in">
+    <a href="#/" data-tab="works">작품</a>
+    <a href="#/series" data-tab="series">시리즈</a>
+    <a href="#/ads" data-tab="ads">광고 작업</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="chips" id="chips" hidden></div>
+  <main class="grid" id="grid" aria-live="polite"></main>
+  <footer class="foot"><span id="updated"></span></footer>
+</div>
+
+<div class="player" id="player" hidden role="dialog" aria-modal="true" aria-label="영상 재생">
+  <div class="stage" id="stage">
+    <video id="video" playsinline controls loop preload="none"></video>
+    <div class="fallback" id="fallback" hidden></div>
+    <div class="pinfo">
+      <p class="ptitle" id="ptitle"></p>
+      <p class="pmeta" id="pmeta"></p>
+    </div>
+  </div>
+  <div class="pctl">
+    <button id="pclose" aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <button id="pprev" aria-label="이전 영상"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+    <button id="pnext" aria-label="다음 영상"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    <a id="porig" target="_blank" rel="noopener" aria-label="원본에서 보기"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+  </div>
+</div>
+
+<script src="app.js" defer></script>
+</body>
+</html>

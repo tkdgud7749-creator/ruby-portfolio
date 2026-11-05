@@ -1,0 +1,11 @@
+{
+  "name": "ruby-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "feed": "node scripts/build-feed.mjs"
+  },
+  "dependencies": {
+    "sharp": "0.33.5"
+  }
+}

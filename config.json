@@ -1,0 +1,36 @@
+{
+  "contact": { "user": "pabguji", "domain": "gmail.com" },
+
+  "sheetCsvEnv": "SHEET_CSV_URL",
+
+  "channels": [
+    {
+      "key": "liora",
+      "name": "Liora Solveil",
+      "tagline": "AI Film Creator",
+      "avatar": "",
+      "instagram": { "handle": "liorasolveil", "tokenEnv": "IG_TOKEN_MAIN" },
+      "facebook": { "pageId": "61594447989067", "url": "https://www.facebook.com/profile.php?id=61594447989067", "tokenEnv": "FB_PAGE_TOKEN_1" },
+      "x": { "handle": "LioraSolveil", "bearerEnv": "X_BEARER_TOKEN", "followersManual": null },
+      "seriesOrder": ["묘한 이야기", "해리, 내 뒤에 있어", "UNCAGED"],
+      "seriesKeywords": {
+        "묘한 이야기": ["묘한 이야기", "묘한이야기"],
+        "해리, 내 뒤에 있어": ["해리, 내 뒤에 있어", "해리 내 뒤에 있어", "해리,내뒤에있어", "내 뒤에 있어"],
+        "UNCAGED": ["UNCAGED"]
+      }
+    },
+    {
+      "key": "milo",
+      "name": "Milo&Luna",
+      "tagline": "Milo & Luna World",
+      "avatar": "",
+      "instagram": { "handle": "milo_lunaworld", "tokenEnv": "IG_TOKEN_MILO" },
+      "facebook": { "pageId": "61594976046615", "url": "https://www.facebook.com/profile.php?id=61594976046615", "tokenEnv": "FB_PAGE_TOKEN_2" },
+      "seriesOrder": [],
+      "seriesKeywords": {}
+    }
+  ],
+
+  "adHashtags": ["광고", "유료광고", "협찬", "ad", "sponsored", "paidpartnership"],
+  "adPhrases": ["유료 광고", "유료광고 포함", "paid partnership"]
+}

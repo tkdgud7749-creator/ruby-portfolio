@@ -1,0 +1,20 @@
+name: 인스타 토큰 갱신
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'   # 매주 월요일
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/refresh-tokens.mjs
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          IG_TOKEN_MAIN: ${{ secrets.IG_TOKEN_MAIN }}
+          IG_TOKEN_MILO: ${{ secrets.IG_TOKEN_MILO }}
