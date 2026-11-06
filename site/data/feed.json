@@ -1,5 +1,5 @@
 {
- "updatedAt": "2026-11-06T18:54:59.154Z",
+ "updatedAt": "2026-11-06T19:54:39.340Z",
  "weekBase": null,
  "contact": {
   "user": "pabguji",
@@ -300,7 +300,7 @@
      "key": "facebook",
      "label": "Facebook",
      "url": "https://www.facebook.com/profile.php?id=61594976046615",
-     "count": 5146
+     "count": 5000
     }
    ],
    "seriesOrder": [
