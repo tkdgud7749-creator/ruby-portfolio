@@ -17,7 +17,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <!-- X·인스타 영상 서버는 다른 사이트에서 온 요청(Referer)을 막으므로 보내지 않는다 -->
 <meta name="referrer" content="no-referrer">
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Fredoka:wght@500;700&display=swap">
+<link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
 <div class="wrap">
@@ -31,27 +35,29 @@
       </div>
     </div>
     <div class="actions">
-      <a class="btn ghost" id="kitBtn" href="#/kit">미디어킷</a>
-      <button class="btn" id="contact" type="button">광고 문의</button>
+      <button class="btn ghost sm lang" id="lang" type="button">EN</button>
+      <a class="btn ghost" id="kitBtn" href="#/kit" data-t="kit">미디어킷</a>
+      <button class="btn" id="contact" type="button" data-t="contact">광고 문의</button>
     </div>
     <ul class="followers" id="followers"></ul>
   </header>
 
-  <p class="demo" id="demo" hidden>샘플 데이터로 보여 주는 시안이에요. 계정을 연결하면 실제 영상으로 바뀝니다.</p>
+  <p class="demo" id="demo" data-t="demo" hidden>샘플 데이터로 보여 주는 시안이에요. 계정을 연결하면 실제 영상으로 바뀝니다.</p>
   <section class="hero" id="hero" hidden></section>
 </div>
 
 <nav class="tabs" aria-label="보기 선택">
   <div class="wrap tabs-in">
-    <a href="#/" data-tab="works">작품</a>
-    <a href="#/series" data-tab="series">시리즈</a>
-    <a href="#/ads" data-tab="ads">광고 작업</a>
-    <a href="#/kit" data-tab="kit">미디어킷</a>
+    <a href="#/" data-tab="works" data-t="works">작품</a>
+    <a href="#/series" data-tab="series" data-t="series">시리즈</a>
+    <a href="#/ads" data-tab="ads" data-t="ads">광고 작업</a>
+    <a href="#/kit" data-tab="kit" data-t="kit">미디어킷</a>
   </div>
 </nav>
 
 <div class="wrap">
   <div class="chips" id="chips" hidden></div>
+  <div class="sorts" id="sorts" hidden></div>
   <main class="grid" id="grid" aria-live="polite"></main>
   <section class="kit" id="kit" hidden></section>
   <footer class="foot"><span id="updated"></span></footer>
@@ -67,27 +73,28 @@
     </div>
   </div>
   <div class="pctl">
-    <button id="pclose" aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <button id="pprev" aria-label="이전 영상"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
-    <button id="pnext" aria-label="다음 영상"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
-    <a id="porig" target="_blank" rel="noopener" aria-label="원본에서 보기"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+    <button id="pclose" aria-label="닫기" data-t-label="close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <button id="pprev" aria-label="이전 영상" data-t-label="prev"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+    <button id="pnext" aria-label="다음 영상" data-t-label="next"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    <button id="pshare" type="button" aria-label="링크 복사" data-t-label="copyLink"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>
+    <a id="porig" target="_blank" rel="noopener" aria-label="원본에서 보기" data-t-label="orig"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
   </div>
 </div>
 
 <dialog class="dlg" id="contactDlg" aria-labelledby="dlgTitle">
   <form method="dialog" class="dlg-in">
     <button class="dlg-x" value="close" aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-    <h2 id="dlgTitle">광고·협업 문의</h2>
-    <p class="dlg-sub">브랜드·제품 소개와 원하시는 일정을 보내 주세요. 확인 후 빠르게 회신드릴게요.</p>
-    <div class="mail-row"><span id="mailAddr"></span><button type="button" class="btn ghost sm" id="copyMail">주소 복사</button></div>
+    <h2 id="dlgTitle" data-t="dlgTitle">광고·협업 문의</h2>
+    <p class="dlg-sub" data-t="dlgSub">브랜드·제품 소개와 원하시는 일정을 보내 주세요. 확인 후 빠르게 회신드릴게요.</p>
+    <div class="mail-row"><span id="mailAddr"></span><button type="button" class="btn ghost sm" id="copyMail" data-t="copyMail">주소 복사</button></div>
     <div class="dlg-btns">
-      <a class="btn" id="gmailLink" target="_blank" rel="noopener">Gmail로 쓰기</a>
-      <a class="btn ghost" id="mailtoLink">메일 앱으로 쓰기</a>
+      <a class="btn" id="gmailLink" target="_blank" rel="noopener" data-t="gmail">Gmail로 쓰기</a>
+      <a class="btn ghost" id="mailtoLink" data-t="mailApp">메일 앱으로 쓰기</a>
     </div>
     <p class="dlg-note" id="copyNote" aria-live="polite"></p>
   </form>
 </dialog>
 
-<script src="app.js?v=2" defer></script>
+<script src="app.js?v=3" defer></script>
 </body>
 </html>

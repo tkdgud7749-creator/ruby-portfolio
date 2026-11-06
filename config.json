@@ -58,7 +58,8 @@
         ],
         "services": [],
         "faq": []
-      }
+      },
+      "theme": "dark"
     },
     {
       "key": "milo",
@@ -93,7 +94,8 @@
         ],
         "services": [],
         "faq": []
-      }
+      },
+      "theme": "warm"
     }
   ],
   "adHashtags": [

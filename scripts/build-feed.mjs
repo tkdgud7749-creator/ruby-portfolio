@@ -16,6 +16,13 @@ const cfg = JSON.parse(await fs.readFile(path.join(ROOT, 'config.json'), 'utf8')
 const loaded = await fs.readFile(FEED, 'utf8').then(JSON.parse).catch(() => null);
 const prev = loaded && !loaded.demo && loaded.channels ? loaded : { items: [], channels: [] }; // 샘플·옛 형식은 이어받지 않는다
 const prevItems = prev.items || [];
+// 캡션에 적힌 제작 툴(예: "Made with higgsfield.ai", "#DomoAI")을 배지로
+const TOOLS = [
+  ['Higgsfield', /higgsfield/i], ['DomoAI', /domo\s*ai|@domoai|#domo/i], ['Pollo AI', /pollo/i], ['Seedance', /seedance/i],
+  ['Dreamina', /dreamina/i], ['Kling', /kling/i], ['Hailuo', /hailuo|minimax/i], ['Runway', /runway/i], ['Veo', /\bveo\s*\d/i],
+  ['Sora', /\bsora\b/i], ['Midjourney', /midjourney/i], ['Nano Banana', /nano\s*banana/i], ['PixVerse', /pixverse/i], ['Vidu', /\bvidu\b/i],
+];
+const toolsOf = (text) => TOOLS.filter(([, re]) => re.test(String(text || ''))).map(([n]) => n);
 const prevCount = (ch, key) => (prev.channels.find((c) => c.key === ch)?.followers || []).find((f) => f.key === key)?.count ?? null;
 const channels = cfg.channels || [];
 const log = (...a) => console.log('[feed]', ...a);
@@ -339,7 +346,7 @@ for (const ch of channels) {
     followers.push({ key: 'x', label: 'X', url: `https://x.com/${ch.x.handle}`, count });
   }
 
-  chOut.push({ key: ch.key, name: ch.name, tagline: ch.tagline || '', avatar, followers, seriesOrder: ch.seriesOrder || [], stats, kit: ch.mediaKit || null });
+  chOut.push({ key: ch.key, name: ch.name, tagline: ch.tagline || '', avatar, followers, seriesOrder: ch.seriesOrder || [], stats, kit: ch.mediaKit || null, theme: ch.theme || "dark" });
 }
 
 let sheet = null;
@@ -395,6 +402,7 @@ for (const it of items.values()) {
     // 다음 실행 때 계정 연결이 실패하면 이 값으로 이어 쓴다 (캡션 전체는 무거워서 저장하지 않음)
     _ad: it.caption != null ? isAd(it.caption) : Boolean(it._ad),
     _mention: it.caption != null ? firstMention(it.caption) : it._mention || null,
+    tools: it.caption != null ? toolsOf(it.caption) : it.tools || [],
     code: it.code || undefined,
     thumbSrc: it.thumbSrc || undefined,
     _sheet: it.sheet || undefined,
@@ -406,8 +414,26 @@ for (const it of items.values()) {
 }
 out.sort((a, b) => +new Date(b.date || 0) - +new Date(a.date || 0));
 
+// 이번 주 조회수 증가: 날짜별 조회수 기록(최근 9일)을 남겨, 7일 전(없으면 가장 오래된 기록)과 비교한다
+const HIST = path.join(SITE, 'data', 'history.json');
+const hist = await fs.readFile(HIST, 'utf8').then(JSON.parse).catch(() => ({}));
+const today = new Date().toISOString().slice(0, 10);
+hist[today] = Object.fromEntries(out.filter((i) => i.views != null).map((i) => [i.id, i.views]));
+for (const d of Object.keys(hist)) if ((Date.parse(today) - Date.parse(d)) / 864e5 > 9) delete hist[d];
+const days = Object.keys(hist).sort();
+const base = days.filter((d) => (Date.parse(today) - Date.parse(d)) / 864e5 >= 7).pop() || (days[0] !== today ? days[0] : null);
+for (const i of out) {
+  if (i.views == null) continue;
+  const was = base ? hist[base][i.id] : undefined;
+  if (was != null) i.weekGain = Math.max(0, i.views - was);
+  else if (i.date && Date.parse(today) - Date.parse(i.date) < 7 * 864e5) i.weekGain = i.views; // 이번 주에 올린 영상은 전부 이번 주 조회
+}
+await fs.writeFile(HIST, JSON.stringify(hist));
+const weekBase = base;
+
 const feed = {
   updatedAt: new Date().toISOString(),
+  weekBase,
   contact: cfg.contact,
   channels: chOut,
   items: out,
