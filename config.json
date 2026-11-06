@@ -25,7 +25,7 @@
       "tagline": "Milo & Luna World",
       "avatar": "",
       "instagram": { "handle": "milo_lunaworld", "tokenEnv": "IG_TOKEN_MAIN", "igUserId": "17841455144621523" },
-      "facebook": { "pageId": "61594976046615", "url": "https://www.facebook.com/profile.php?id=61594976046615", "tokenEnv": "IG_TOKEN_MAIN", "followersManual": 5000 },
+      "facebook": { "pageId": "61594976046615", "url": "https://www.facebook.com/profile.php?id=61594976046615", "pageName": "MiloLuna", "tokenEnv": "IG_TOKEN_MAIN", "followersManual": 5000 },
       "seriesOrder": ["Milo&Luna"],
       "seriesKeywords": {},
       "episodeSeries": "Milo&Luna"

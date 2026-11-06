@@ -257,10 +257,19 @@ for (const ch of channels) {
     let count = fb.followersManual ?? prevCount(ch.key, 'facebook');
     const token = process.env[fb.tokenEnv];
     if (token) {
+      const tk = encodeURIComponent(token);
       try {
-        const p = await getJSON(`${FB}/${fb.pageId}?fields=followers_count,fan_count&access_token=${encodeURIComponent(token)}`);
+        const p = await getJSON(`${FB}/${fb.pageId}?fields=followers_count,fan_count&access_token=${tk}`);
         count = p.followers_count ?? p.fan_count ?? count;
-      } catch (e) { log(`${ch.key} 페이스북 실패`, e.message); }
+      } catch (e) {
+        // 프로필 주소의 숫자와 Graph 페이지 ID가 다를 수 있어, 토큰이 관리하는 페이지 목록에서 이름으로 찾는다
+        try {
+          const list = await getJSON(`${FB}/me/accounts?fields=id,name,followers_count,fan_count&limit=100&access_token=${tk}`);
+          const pg = (list.data || []).find((x) => x.id === fb.pageId || (fb.pageName && x.name?.toLowerCase() === fb.pageName.toLowerCase()));
+          if (!pg) throw new Error(`페이지 목록에 없음 (${(list.data || []).map((x) => `${x.name}:${x.id}`).join(', ')})`);
+          count = pg.followers_count ?? pg.fan_count ?? count;
+        } catch (e2) { log(`${ch.key} 페이스북 실패`, e2.message); }
+      }
     }
     followers.push({ key: 'facebook', label: 'Facebook', url: fb.url, count });
   }
