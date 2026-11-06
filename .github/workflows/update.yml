@@ -40,7 +40,7 @@ jobs:
           git config user.name "feed-bot"
           git config user.email "feed-bot@users.noreply.github.com"
           git add site/data site/thumbs
-          git diff --cached --quiet || (git commit -m "영상 목록 갱신" && git push)
+          git diff --cached --quiet || (git commit -m "영상 목록 갱신" && (git push || (git pull --rebase -X theirs && git push)))
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
