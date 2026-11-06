@@ -4,8 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Liora Solveil · AI Film Creator</title>
-<meta name="description" content="AI 영상 크리에이터 포트폴리오 — 작품, 시리즈, 광고 작업">
+<meta name="description" content="AI 영상 크리에이터 리오라 솔베일의 포트폴리오 — 작품, 시리즈, 광고 작업, 미디어킷">
 <meta name="theme-color" content="#0b0b0d">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Liora Solveil">
+<meta property="og:title" content="Liora Solveil · AI Film Creator">
+<meta property="og:description" content="AI 숏폼 영상 포트폴리오 · 작품, 시리즈, 광고 작업, 미디어킷">
+<meta property="og:url" content="https://tkdgud7749-creator.github.io/ruby-portfolio/">
+<meta property="og:image" content="https://tkdgud7749-creator.github.io/ruby-portfolio/thumbs/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <!-- X·인스타 영상 서버는 다른 사이트에서 온 요청(Referer)을 막으므로 보내지 않는다 -->
 <meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="styles.css">
@@ -21,11 +30,15 @@
         <p class="tagline" id="tagline">AI Film Creator</p>
       </div>
     </div>
-    <a class="contact" id="contact" href="#">광고 문의</a>
+    <div class="actions">
+      <a class="btn ghost" id="kitBtn" href="#/kit">미디어킷</a>
+      <button class="btn" id="contact" type="button">광고 문의</button>
+    </div>
     <ul class="followers" id="followers"></ul>
   </header>
 
   <p class="demo" id="demo" hidden>샘플 데이터로 보여 주는 시안이에요. 계정을 연결하면 실제 영상으로 바뀝니다.</p>
+  <section class="hero" id="hero" hidden></section>
 </div>
 
 <nav class="tabs" aria-label="보기 선택">
@@ -33,12 +46,14 @@
     <a href="#/" data-tab="works">작품</a>
     <a href="#/series" data-tab="series">시리즈</a>
     <a href="#/ads" data-tab="ads">광고 작업</a>
+    <a href="#/kit" data-tab="kit">미디어킷</a>
   </div>
 </nav>
 
 <div class="wrap">
   <div class="chips" id="chips" hidden></div>
   <main class="grid" id="grid" aria-live="polite"></main>
+  <section class="kit" id="kit" hidden></section>
   <footer class="foot"><span id="updated"></span></footer>
 </div>
 
@@ -58,6 +73,20 @@
     <a id="porig" target="_blank" rel="noopener" aria-label="원본에서 보기"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
   </div>
 </div>
+
+<dialog class="dlg" id="contactDlg" aria-labelledby="dlgTitle">
+  <form method="dialog" class="dlg-in">
+    <button class="dlg-x" value="close" aria-label="닫기"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h2 id="dlgTitle">광고·협업 문의</h2>
+    <p class="dlg-sub">브랜드·제품 소개와 원하시는 일정을 보내 주세요. 확인 후 빠르게 회신드릴게요.</p>
+    <div class="mail-row"><span id="mailAddr"></span><button type="button" class="btn ghost sm" id="copyMail">주소 복사</button></div>
+    <div class="dlg-btns">
+      <a class="btn" id="gmailLink" target="_blank" rel="noopener">Gmail로 쓰기</a>
+      <a class="btn ghost" id="mailtoLink">메일 앱으로 쓰기</a>
+    </div>
+    <p class="dlg-note" id="copyNote" aria-live="polite"></p>
+  </form>
+</dialog>
 
 <script src="app.js" defer></script>
 </body>

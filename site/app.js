@@ -33,9 +33,7 @@
     }
     feed.items = (feed.items || []).filter((i) => !i.hidden);
     feed.channels = feed.channels || [];
-    const c = feed.contact || {};
-    if (c.user && c.domain) $('#contact').href = `mailto:${c.user}@${c.domain}?subject=${encodeURIComponent('[광고 문의] ')}`;
-    else $('#contact').hidden = true;
+    setupContact(feed.contact || {});
     $('#demo').hidden = !feed.demo;
     if (feed.updatedAt) {
       const d = new Date(feed.updatedAt);
@@ -44,6 +42,33 @@
     window.addEventListener('hashchange', route);
     route();
   }
+
+  // ---------- 광고 문의: PC에 메일 앱이 없으면 mailto가 아무 반응이 없어서, Gmail·메일 앱·주소 복사를 함께 준다 ----------
+  let mailAddr = '';
+  function setupContact(c) {
+    if (!c.user || !c.domain) { $('#contact').hidden = true; return; }
+    mailAddr = `${c.user}@${c.domain}`;
+    $('#contact').addEventListener('click', openContact);
+    $('#copyMail').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(mailAddr); $('#copyNote').textContent = '메일 주소를 복사했어요.'; }
+      catch { $('#copyNote').textContent = mailAddr; }
+    });
+    $('#contactDlg').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+  }
+  function openContact() {
+    const subject = `[광고 문의] ${ch?.name || ''} 협업 제안`;
+    const body = ['안녕하세요, 협업 제안드립니다.', '', '- 브랜드/제품:', '- 원하는 콘텐츠 형식:', '- 희망 일정:', '- 예산(선택):', '- 담당자 연락처:', ''].join('\n');
+    const q = `su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    $('#mailAddr').textContent = mailAddr;
+    $('#gmailLink').href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(mailAddr)}&${q}`;
+    $('#mailtoLink').href = `mailto:${mailAddr}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    $('#copyNote').textContent = '';
+    const d = $('#contactDlg');
+    if (d.showModal) d.showModal(); else location.href = $('#mailtoLink').href;
+  }
+
+  const total = (arr, f) => arr.reduce((a, x) => a + (f(x) || 0), 0);
+  const ymd = (d) => { const t = new Date(d); return isNaN(t) ? '' : `${t.getFullYear()}.${String(t.getMonth() + 1).padStart(2, '0')}.${String(t.getDate()).padStart(2, '0')}`; };
 
   function renderChannel() {
     const sw = $('#channels');
@@ -63,7 +88,32 @@
     document.querySelectorAll('.tabs a').forEach((a) => {
       a.href = a.dataset.tab === 'works' ? link() : link(a.dataset.tab);
     });
+    $('#kitBtn').href = link('kit');
   }
+
+  // 첫 화면 상단: 채널 숫자 요약 + 대표작(조회수 1위)
+  function renderHero(works) {
+    const hero = $('#hero');
+    const top = works[0];
+    if (!top) { hero.hidden = true; return; }
+    const fol = total(ch.followers || [], (f) => f.count);
+    const views = total(items, (i) => i.views);
+    hero.hidden = false;
+    hero.innerHTML = `
+      <div class="hero-txt">
+        <p class="eyebrow">BEST · 조회수 1위</p>
+        <h2>${esc(top.title || '대표작')}</h2>
+        <p class="hero-meta">${[top.views != null ? `조회수 ${fmt(top.views)}` : '', top.series ? [top.series, epLabel(top)].filter(Boolean).join(' ') : '', ymd(top.date)].filter(Boolean).map(esc).join(' · ')}</p>
+        <button class="btn" type="button" data-play="0">${EYE} 재생</button>
+        <dl class="stats">
+          ${fol ? `<div><dt>총 팔로워</dt><dd>${fmt(fol)}</dd></div>` : ''}
+          ${views ? `<div><dt>누적 조회수</dt><dd>${fmt(views)}</dd></div>` : ''}
+          <div><dt>작품</dt><dd>${items.length}편</dd></div>
+        </dl>
+      </div>
+      <button class="hero-art card" type="button" data-play="0" aria-label="${esc(top.title || '대표작')} 재생">${thumb(top, '', false)}<span class="play">${EYE}</span></button>`;
+  }
+  $('#hero').addEventListener('click', (e) => { const b = e.target.closest('[data-play]'); if (b) openPlayer(+b.dataset.play); });
 
   function seriesList() {
     const m = new Map();
@@ -92,11 +142,16 @@
     renderChannel();
     const [tab, ...rest] = parts;
     const name = rest.join('/');
-    const which = tab === 'series' ? 'series' : tab === 'ads' ? 'ads' : 'works';
+    const which = ['series', 'ads', 'kit'].includes(tab) ? tab : 'works';
     document.querySelectorAll('.tabs a').forEach((a) => {
       if (a.dataset.tab === which) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
+    $('#kitBtn').toggleAttribute('aria-current', which === 'kit');
+    $('#hero').hidden = true;
+    $('#kit').hidden = which !== 'kit';
+    $('#grid').hidden = which === 'kit';
+    if (which === 'kit') { $('#chips').hidden = true; return renderKit(); }
 
     const chips = $('#chips');
     chips.hidden = which !== 'series';
@@ -109,7 +164,9 @@
       return renderGrid(active.items.slice().sort(byEpisode));
     }
     if (which === 'ads') return renderGrid(items.filter((i) => i.ad).sort(byViews), '광고 작업이 아직 없어요.');
-    return renderGrid(items.filter((i) => !i.ad).sort(byViews), '아직 영상이 없어요.', true);
+    const works = items.filter((i) => !i.ad).sort(byViews);
+    renderGrid(works, '아직 영상이 없어요.', true);
+    renderHero(works);
   }
 
   // 가로 영상은 잘라내지 않고 가운데에 통째로 보여 주고, 같은 이미지를 흐리게 깔아 빈 곳을 채운다
@@ -136,8 +193,9 @@
         ${it.ad && it.brand ? `<span class="tag brand">${esc(it.brand)}</span>` : ''}
         <span class="tag pf">${it.platform === 'x' ? 'X' : 'IG'}</span>
         <span class="meta">
+          ${(() => { const e = it.series ? (ranked ? [it.series, epLabel(it)].filter(Boolean).join(' ') : epLabel(it)) : ''; return e ? `<span class="ep">${esc(e)}</span>` : ''; })()}
           <span class="t">${esc(it.title || '제목 없음')}</span>
-          ${it.views != null ? `<span class="v">${EYE}${fmt(it.views)}</span>` : ''}
+          <span class="v">${it.views != null ? `${EYE}${fmt(it.views)}` : ''}<span class="d">${ymd(it.date)}</span></span>
         </span>
       </button>`).join('');
   }
@@ -157,6 +215,78 @@
   }
 
   $('#grid').addEventListener('click', (e) => {
+    const c = e.target.closest('button.card');
+    if (c) openPlayer(+c.dataset.i);
+  });
+
+  // ---------- 미디어킷: 실측 숫자는 자동, 소개·서비스·FAQ는 config.json의 mediaKit에서 ----------
+  const AGE = (k) => k;
+  const GENDER = { F: '여성', M: '남성', U: '기타' };
+  let regionName = (k) => k;
+  try { const dn = new Intl.DisplayNames(['ko'], { type: 'region' }); regionName = (k) => dn.of(k) || k; } catch {}
+  const bars = (rows, label, n = 5) => rows.slice(0, n).map((r) => `<li><span>${esc(label(r.k))}</span><i style="--p:${r.p}%"></i><b>${one(r.p)}%</b></li>`).join('');
+
+  function renderKit() {
+    const kit = ch.kit || {};
+    const st = ch.stats || {};
+    const vids = items.filter((i) => i.views != null);
+    const fol = total(ch.followers || [], (f) => f.count);
+    const views = total(items, (i) => i.views);
+    const avg = vids.length ? views / vids.length : 0;
+    const topWorks = items.filter((i) => !i.ad).sort(byViews).slice(0, 6);
+    const ads = items.filter((i) => i.ad).sort(byViews);
+    list = [...topWorks, ...ads];
+    const card = (it, i) => `<button class="card" data-i="${i}" aria-label="${esc(it.title || '영상')} 재생">${thumb(it, undefined, false)}
+      ${it.ad && it.brand ? `<span class="tag brand">${esc(it.brand)}</span>` : ''}
+      <span class="meta"><span class="t">${esc(it.title || '제목 없음')}</span><span class="v">${it.views != null ? `${EYE}${fmt(it.views)}` : ''}<span class="d">${ymd(it.date)}</span></span></span></button>`;
+    const kpi = (v, l, s) => v ? `<div class="kpi"><b>${v}</b><span>${l}</span>${s ? `<small>${s}</small>` : ''}</div>` : '';
+    const steps = kit.process || ['문의·브리프', '기획안 제안', '제작', '수정·컨펌', '발행·리포트'];
+    const asOf = st.asOf ? st.asOf.replace(/-/g, '.') : ymd(feed.updatedAt);
+    $('#kit').innerHTML = `
+      <div class="kit-cover">
+        <p class="eyebrow">PORTFOLIO &amp; MEDIA KIT</p>
+        <h2>${esc(kit.headline || `${ch.name}입니다.`)}</h2>
+        ${kit.intro ? `<p class="lead">${esc(kit.intro)}</p>` : ''}
+        ${(kit.brands || []).length ? `<p class="fit-label">이런 브랜드와 잘 맞아요</p><ul class="fit">${kit.brands.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
+      </div>
+
+      <h3 class="sec">숫자로 보는 채널</h3>
+      <div class="kpis">
+        ${kpi(fol ? fmt(fol) : '', '총 팔로워', (ch.followers || []).filter((f) => f.count != null).map((f) => `${f.label} ${fmt(f.count)}`).join(' · '))}
+        ${kpi(views ? fmt(views) : '', '누적 조회수', `영상 ${vids.length}편 합계`)}
+        ${kpi(avg ? fmt(avg) : '', '영상당 평균 조회수')}
+        ${kpi(st.reach ? fmt(st.reach) : '', '월간 도달', '최근 30일 · 인스타그램')}
+        ${kpi(st.views ? fmt(st.views) : '', '월간 조회수', '최근 30일 · 인스타그램')}
+        ${kpi(st.total_interactions ? fmt(st.total_interactions) : '', '월간 상호작용', '좋아요·댓글·저장·공유')}
+      </div>
+
+      ${st.age || st.gender || st.country ? `<h3 class="sec">누가 보나요</h3>
+      <div class="aud">
+        ${st.age ? `<div><h4>연령</h4><ul class="bars">${bars(st.age, AGE)}</ul></div>` : ''}
+        ${st.gender ? `<div><h4>성별</h4><ul class="bars">${bars(st.gender, (k) => GENDER[k] || k, 3)}</ul></div>` : ''}
+        ${st.country ? `<div><h4>국가</h4><ul class="bars">${bars(st.country, regionName, 4)}</ul></div>` : ''}
+      </div>` : ''}
+
+      ${topWorks.length ? `<h3 class="sec">대표 작품</h3><div class="grid kit-grid">${topWorks.map((it, i) => card(it, i)).join('')}</div>` : ''}
+      ${ads.length ? `<h3 class="sec">브랜드 협업</h3><div class="grid kit-grid">${ads.map((it, i) => card(it, topWorks.length + i)).join('')}</div>` : ''}
+
+      ${(kit.services || []).length ? `<h3 class="sec">제작 상품</h3><div class="svc">${kit.services.map((s) => `<div><h4>${esc(s.title)}</h4>${s.desc ? `<p>${esc(s.desc)}</p>` : ''}${s.price ? `<b>${esc(s.price)}</b>` : ''}</div>`).join('')}</div>` : ''}
+
+      <h3 class="sec">진행 과정</h3>
+      <ol class="steps">${steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+
+      ${(kit.faq || []).length ? `<h3 class="sec">자주 묻는 질문</h3><div class="faq">${kit.faq.map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join('')}</div>` : ''}
+
+      <div class="kit-cta">
+        <h3>함께 만들어 볼까요?</h3>
+        <p>브랜드·제품 소개와 원하시는 일정만 보내 주세요.</p>
+        <div class="kit-btns"><button class="btn" type="button" data-contact>광고 문의</button><button class="btn ghost" type="button" data-print>PDF로 저장</button></div>
+        <p class="src">수치는 인스타그램 공식 API 기준 · ${esc(asOf)}</p>
+      </div>`;
+  }
+  $('#kit').addEventListener('click', (e) => {
+    if (e.target.closest('[data-contact]')) return openContact();
+    if (e.target.closest('[data-print]')) return window.print();
     const c = e.target.closest('button.card');
     if (c) openPlayer(+c.dataset.i);
   });

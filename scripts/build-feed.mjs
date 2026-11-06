@@ -99,6 +99,40 @@ async function fetchByDiscovery(ch, t, via) {
   };
 }
 
+// 미디어킷용 계정 통계: 최근 30일 도달·조회·상호작용, 팔로워 연령·성별·국가 (인스타 공식 인사이트)
+async function accountStats(ch, t, node) {
+  const out = { asOf: new Date().toISOString().slice(0, 10) };
+  const until = Math.floor(Date.now() / 1000), since = until - 30 * 86400;
+  for (const m of ['reach', 'views', 'total_interactions', 'accounts_engaged']) {
+    try {
+      const r = await getJSON(`${FB}/${node}/insights?metric=${m}&period=day&metric_type=total_value&since=${since}&until=${until}&access_token=${t}`);
+      const v = r.data?.[0]?.total_value?.value;
+      if (v != null) out[m] = v;
+    } catch (e) { log(`${ch.key}: 인사이트 ${m} 실패`, e.message); }
+  }
+  for (const b of ['age', 'gender', 'country']) {
+    try {
+      const r = await getJSON(`${FB}/${node}/insights?metric=follower_demographics&period=lifetime&metric_type=total_value&breakdown=${b}&access_token=${t}`);
+      const rows = r.data?.[0]?.total_value?.breakdowns?.[0]?.results || [];
+      const total = rows.reduce((a, x) => a + (x.value || 0), 0);
+      if (total) out[b] = rows.map((x) => ({ k: x.dimension_values?.[0], p: Math.round((x.value / total) * 1000) / 10 })).sort((a, z) => z.p - a.p);
+    } catch (e) { log(`${ch.key}: 팔로워 ${b} 분포 실패`, e.message); }
+  }
+  return out;
+}
+
+async function saveImage(src, file, opts) {
+  if (!sharp || !src) return false;
+  try {
+    const r = await fetch(src);
+    if (!r.ok) throw new Error(r.status);
+    let img = sharp(Buffer.from(await r.arrayBuffer())).resize(opts);
+    img = file.endsWith('.jpg') ? img.jpeg({ quality: 80 }) : img.webp({ quality: 80 });
+    await img.toFile(file);
+    return true;
+  } catch (e) { log('이미지 저장 실패', path.basename(file), e.message); return false; }
+}
+
 async function fetchInstagram(ch) {
   const acc = ch.instagram;
   const token = process.env[acc.tokenEnv];
@@ -118,7 +152,7 @@ async function fetchInstagram(ch) {
     }
     if (!node) throw new Error('인스타 계정 ID를 찾지 못함 (config의 instagram.igUserId 필요)');
     try {
-      me = await getJSON(`${FB}/${node}?fields=id,username,followers_count&access_token=${t}`);
+      me = await getJSON(`${FB}/${node}?fields=id,username,followers_count,media_count,profile_picture_url&access_token=${t}`);
     } catch (e) {
       // 직접 권한이 없으면, 같은 토큰으로 읽히는 다른 채널 계정을 통해 공개 정보(비즈니스 디스커버리)로 가져온다
       const viaList = cfg.channels.map((c) => c.instagram?.igUserId).filter((id) => id && id !== node);
@@ -148,9 +182,13 @@ async function fetchInstagram(ch) {
     } catch (e) { log(`${ch.key}: 공개 조회수 실패 → 인스타 단독 조회수 사용`, e.message); }
   }
   log(`${ch.key}: @${me.username} 영상 ${videos.length}개, 팔로워 ${me.followers_count}`);
+  const stats = base === FB ? await accountStats(ch, t, node) : null;
   return {
     followers: me.followers_count ?? null,
     username: me.username,
+    avatarSrc: me.profile_picture_url || null,
+    mediaCount: me.media_count ?? null,
+    stats,
     items: videos.map((m) => ({
       id: `ig-${m.id}`,
       platform: 'instagram',
@@ -252,12 +290,17 @@ const channelOfX = (handle) => channels.find((c) => c.x?.handle && norm(c.x.hand
 
 for (const ch of channels) {
   const followers = [];
+  const prevCh = (prev.channels || []).find((c) => c.key === ch.key) || {};
+  let avatar = ch.avatar || prevCh.avatar || '';
+  let stats = prevCh.stats || null;
 
   if (ch.instagram?.handle) {
     let res = null;
     try { res = await fetchInstagram(ch); } catch (e) { log(`${ch.key} 인스타 실패: ${e.message} → 이전 데이터 유지`); }
     const old = prevItems.filter((i) => i.platform === 'instagram' && i.channel === ch.key && !i.id.startsWith('ig-link-'));
     for (const it of res ? res.items : old) items.set(it.id, it);
+    if (res?.stats) stats = res.stats;
+    if (!ch.avatar && res?.avatarSrc && await saveImage(res.avatarSrc, path.join(THUMBS, `avatar-${ch.key}.webp`), { width: 160, height: 160, fit: 'cover' })) avatar = `thumbs/avatar-${ch.key}.webp`;
     followers.push({ key: 'instagram', label: 'Instagram', url: `https://www.instagram.com/${res?.username || ch.instagram.handle}/`, count: res ? res.followers : prevCount(ch.key, 'instagram') });
   }
 
@@ -296,7 +339,7 @@ for (const ch of channels) {
     followers.push({ key: 'x', label: 'X', url: `https://x.com/${ch.x.handle}`, count });
   }
 
-  chOut.push({ key: ch.key, name: ch.name, tagline: ch.tagline || '', avatar: ch.avatar || '', followers, seriesOrder: ch.seriesOrder || [] });
+  chOut.push({ key: ch.key, name: ch.name, tagline: ch.tagline || '', avatar, followers, seriesOrder: ch.seriesOrder || [], stats, kit: ch.mediaKit || null });
 }
 
 let sheet = null;
@@ -371,6 +414,22 @@ const feed = {
 };
 await fs.mkdir(path.dirname(FEED), { recursive: true });
 await fs.writeFile(FEED, JSON.stringify(feed, null, 1));
+
+// 링크 미리보기(카톡·DM) 이미지: 첫 채널 조회수 상위 3편 썸네일을 이어 붙인 1200x630
+if (sharp) {
+  try {
+    const top = out.filter((i) => i.channel === chOut[0]?.key && !i.ad && !i.hidden && i.thumb && !/^https?:/.test(i.thumb))
+      .sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 3);
+    if (top.length === 3) {
+      const tiles = await Promise.all(top.map((i) => sharp(path.join(SITE, i.thumb)).resize(400, 630, { fit: 'cover' }).toBuffer()));
+      const ogFile = path.join(THUMBS, 'og.jpg');
+      const buf = await sharp({ create: { width: 1200, height: 630, channels: 3, background: '#0b0b0d' } })
+        .composite(tiles.map((input, k) => ({ input, left: k * 400, top: 0 }))).jpeg({ quality: 82 }).toBuffer();
+      const old = await fs.readFile(ogFile).catch(() => null);
+      if (!old || !old.equals(buf)) await fs.writeFile(ogFile, buf);
+    }
+  } catch (e) { log('미리보기 이미지 실패', e.message); }
+}
 for (const c of chOut) {
   const mine = out.filter((i) => i.channel === c.key);
   log(`${c.key}: 영상 ${mine.length}개, 시리즈 ${new Set(mine.map((i) => i.series).filter(Boolean)).size}개, 광고 ${mine.filter((i) => i.ad).length}개`);
