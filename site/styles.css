@@ -123,7 +123,7 @@ h1 { font-size: 24px; margin: 0; letter-spacing: -0.02em; }
 .aud > div { padding: 16px; border-radius: 14px; background: var(--panel); }
 .aud h4 { margin: 0 0 10px; font-size: 13px; color: var(--muted); }
 .bars { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.bars li { display: grid; grid-template-columns: 64px 1fr 48px; align-items: center; gap: 8px; font-size: 13px; }
+.bars li { display: grid; grid-template-columns: 84px 1fr 48px; align-items: center; gap: 8px; font-size: 13px; }
 .bars i { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--accent) var(--p), rgba(255, 255, 255, .08) var(--p)); }
 .bars b { text-align: right; }
 .kit-grid { padding: 0; }
