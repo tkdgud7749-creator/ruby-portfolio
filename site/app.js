@@ -227,7 +227,6 @@
   const byViews = (a, b) => (b.views ?? -1) - (a.views ?? -1) || time(b) - time(a);
   const byNew = (a, b) => time(b) - time(a);
   const byWeek = (a, b) => (b.weekGain ?? -1) - (a.weekGain ?? -1) || byViews(a, b);
-  const byEpisode = (a, b) => (a.season ?? 1) - (b.season ?? 1) || (a.episode ?? 1e9) - (b.episode ?? 1e9) || time(a) - time(b);
   const epLabel = (it) => [it.season ? t('season', it.season) : '', it.episode ? t('ep', it.episode) : ''].filter(Boolean).join(' ');
 
   function route() {
@@ -272,10 +271,10 @@
       chips.innerHTML = all.map((s) => `<a href="${link('series', s.name)}"${s === active ? ' aria-current="page"' : ''}>${esc(s.name)}<small>${s.items.length}</small></a>`).join('');
       if (!name) { renderCovers(all); return renderCast([[t('mainCast'), castOf((c) => c.series.includes('전체'))], [t('shortCast'), castOf((c) => !c.series.length)]]); }
       if (!active) { renderCast([]); return renderGrid([], t('noSuch', esc(name))); }
-      renderGrid(active.items.slice().sort(byEpisode));
+      renderGrid(active.items.slice().sort(byNew));
       return renderCast([[t('cast'), castOf((c) => c.series.includes('전체') || c.series.some((x) => norm(x) === norm(active.name)))]]);
     }
-    if (which === 'ads') return renderGrid(items.filter((i) => i.ad).sort(byViews), t('noAds'));
+    if (which === 'ads') return renderGrid(items.filter((i) => i.ad).sort(byNew), t('noAds'));
     renderSorts();
     const works = items.filter((i) => !i.ad);
     renderGrid(works.slice().sort(sort === 'new' ? byNew : sort === 'week' ? byWeek : byViews), t('noVideos'), sort !== 'new');

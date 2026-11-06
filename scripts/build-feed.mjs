@@ -17,10 +17,10 @@ const loaded = await fs.readFile(FEED, 'utf8').then(JSON.parse).catch(() => null
 const prev = loaded && !loaded.demo && loaded.channels ? loaded : { items: [], channels: [] }; // 샘플·옛 형식은 이어받지 않는다
 const prevItems = prev.items || [];
 // 캡션에 적힌 제작 플랫폼(예: "Made with higgsfield.ai", "#DomoAI")을 배지로.
-// 생성 모델(Seedance 등)은 플랫폼이 아니라서 넣지 않는다 — 모델은 config.json mediaKit.model 에 따로 적는다
+// 생성 모델(Seedance·Kling 등)은 플랫폼이 아니라서 넣지 않는다 — 모델은 config.json mediaKit.model 에 따로 적는다
 const TOOLS = [
   ['Higgsfield', /higgsfield/i], ['DomoAI', /domo\s*ai|@domoai|#domo/i], ['Pollo AI', /pollo/i],
-  ['Dreamina', /dreamina/i], ['Kling', /kling/i], ['Hailuo', /hailuo|minimax/i], ['Runway', /runway/i],
+  ['Dreamina', /dreamina/i], ['Hailuo', /hailuo|minimax/i], ['Runway', /runway/i],
   ['PixVerse', /pixverse/i], ['Vidu', /\bvidu\b/i],
 ];
 const TOOL_NAMES = new Set(TOOLS.map(([n]) => n));
