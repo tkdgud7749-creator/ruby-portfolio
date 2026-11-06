@@ -370,6 +370,8 @@ for (const it of items.values()) {
     thumb: await localThumb(it),
     video: it.video || null,
     views: s.views ?? it.views ?? null,
+    igViews: s.views != null ? null : it.igViews ?? null,
+    fbViews: s.views != null ? null : it.fbViews ?? null,
     aspect: it.aspect ?? (it.platform === 'instagram' ? 0.5625 : null),
     date: it.date || null,
     series: s.series || seriesFromTitle(title, ch) || null,
