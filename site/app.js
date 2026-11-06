@@ -5,6 +5,7 @@
   const fmt = (n) => {
     if (n == null || isNaN(n)) return '';
     if (n >= 1e8) return one(n / 1e8) + '억';
+    if (n >= 1e7) return Math.round(n / 1e4).toLocaleString('ko-KR') + '만';
     if (n >= 1e4) return one(n / 1e4) + '만';
     return Number(n).toLocaleString('ko-KR');
   };
@@ -224,6 +225,8 @@
   const GENDER = { F: '여성', M: '남성', U: '기타' };
   let regionName = (k) => k;
   try { const dn = new Intl.DisplayNames(['ko'], { type: 'region' }); regionName = (k) => dn.of(k) || k; } catch {}
+  // 성별 '기타(U)'는 비공개라 빼고, 공개한 사람 기준으로 다시 비율을 낸다
+  const known = (rows) => { const r = rows.filter((x) => x.k !== 'U'); const s = r.reduce((a, x) => a + x.p, 0) || 1; return r.map((x) => ({ k: x.k, p: Math.round((x.p / s) * 1000) / 10 })); };
   const bars = (rows, label, n = 5) => rows.slice(0, n).map((r) => `<li><span>${esc(label(r.k))}</span><i style="--p:${r.p}%"></i><b>${one(r.p)}%</b></li>`).join('');
 
   function renderKit() {
@@ -263,7 +266,7 @@
       ${st.age || st.gender || st.country ? `<h3 class="sec">누가 보나요</h3>
       <div class="aud">
         ${st.age ? `<div><h4>연령</h4><ul class="bars">${bars(st.age, AGE)}</ul></div>` : ''}
-        ${st.gender ? `<div><h4>성별</h4><ul class="bars">${bars(st.gender, (k) => GENDER[k] || k, 3)}</ul></div>` : ''}
+        ${st.gender ? `<div><h4>성별 <small>(공개 기준)</small></h4><ul class="bars">${bars(known(st.gender), (k) => GENDER[k] || k, 2)}</ul></div>` : ''}
         ${st.country ? `<div><h4>국가</h4><ul class="bars">${bars(st.country, regionName, 4)}</ul></div>` : ''}
       </div>` : ''}
 
