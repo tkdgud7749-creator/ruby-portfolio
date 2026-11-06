@@ -28,6 +28,7 @@
       topWorks: '대표 작품', collabs: '브랜드 협업', withBrands: '함께한 브랜드', toolsUsed: '제작 툴', services: '제작 상품', process: '진행 과정',
       steps: ['문의·브리프', '기획안 제안', '제작', '수정·컨펌', '발행·리포트'], faq: '자주 묻는 질문',
       ctaH: '함께 만들어 볼까요?', ctaP: '브랜드·제품 소개와 원하시는 일정만 보내 주세요.', pdf: 'PDF로 저장', src: '수치는 인스타그램 공식 API 기준',
+      mainCast: '주요 인물', cast: '등장인물', shortCast: '단편 등장인물',
       langBtn: 'EN', langLabel: 'Switch to English',
     },
     en: {
@@ -51,6 +52,7 @@
       topWorks: 'Top works', collabs: 'Brand collaborations', withBrands: 'Brands', toolsUsed: 'Tools', services: 'Packages', process: 'How we work',
       steps: ['Inquiry & brief', 'Proposal', 'Production', 'Revisions', 'Publish & report'], faq: 'FAQ',
       ctaH: "Let's make something together.", ctaP: 'Send us your brand, product and timeline.', pdf: 'Save as PDF', src: 'Figures from the official Instagram API',
+      mainCast: 'Main cast', cast: 'Cast', shortCast: 'Other characters',
       langBtn: '한국어', langLabel: '한국어로 보기',
     },
   };
@@ -86,6 +88,7 @@
   let list = [];
   let cur = -1;
   let sort = 'pop';
+  let chars = {};   // 채널별 등장인물 (characters.json)
   const video = $('#video');
   const link = (...parts) => '#/' + [ch.key, ...parts].map(encodeURIComponent).join('/');
 
@@ -100,6 +103,7 @@
       $('#grid').innerHTML = `<p class="empty">${t('loadFail')}</p>`;
       return;
     }
+    try { chars = await fetch('characters.json', { cache: 'no-cache' }).then((r) => r.json()); } catch {}
     feed.items = (feed.items || []).filter((i) => !i.hidden);
     feed.channels = feed.channels || [];
     setupContact(feed.contact || {});
@@ -257,6 +261,7 @@
     $('#kit').hidden = which !== 'kit';
     $('#grid').hidden = which === 'kit';
     $('#sorts').hidden = which !== 'works';
+    if (which !== 'series') renderCast([]);
     if (which === 'kit') { $('#chips').hidden = true; return renderKit(); }
 
     const chips = $('#chips');
@@ -265,15 +270,25 @@
       const all = seriesList();
       const active = all.find((s) => norm(s.name) === norm(name));
       chips.innerHTML = all.map((s) => `<a href="${link('series', s.name)}"${s === active ? ' aria-current="page"' : ''}>${esc(s.name)}<small>${s.items.length}</small></a>`).join('');
-      if (!name) return renderCovers(all);
-      if (!active) return renderGrid([], t('noSuch', esc(name)));
-      return renderGrid(active.items.slice().sort(byEpisode));
+      if (!name) { renderCovers(all); return renderCast([[t('mainCast'), castOf((c) => c.series.includes('전체'))], [t('shortCast'), castOf((c) => !c.series.length)]]); }
+      if (!active) { renderCast([]); return renderGrid([], t('noSuch', esc(name))); }
+      renderGrid(active.items.slice().sort(byEpisode));
+      return renderCast([[t('cast'), castOf((c) => c.series.includes('전체') || c.series.some((x) => norm(x) === norm(active.name)))]]);
     }
     if (which === 'ads') return renderGrid(items.filter((i) => i.ad).sort(byViews), t('noAds'));
     renderSorts();
     const works = items.filter((i) => !i.ad);
     renderGrid(works.slice().sort(sort === 'new' ? byNew : sort === 'week' ? byWeek : byViews), t('noVideos'), sort !== 'new');
     renderHero(works);
+  }
+
+  // 시리즈 탭 위쪽 등장인물 줄: 얼굴·이름만 (시트 원본은 올리지 않는다)
+  const castOf = (f) => (chars[ch.key] || []).map((c) => ({ ...c, series: c.series || [] })).filter(f);
+  function renderCast(rows) {
+    const el = $('#cast');
+    const html = rows.filter(([, l]) => l.length).map(([label, l]) => '<div class="cast-row"><h3>' + esc(label) + '</h3><ul>' + l.map((c) => '<li><img src="' + esc(c.img) + '" alt="" loading="lazy" decoding="async"><span>' + esc(c.name) + '</span></li>').join('') + '</ul></div>').join('');
+    el.innerHTML = html;
+    el.hidden = !html;
   }
 
   function renderSorts() {

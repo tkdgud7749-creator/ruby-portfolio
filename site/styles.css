@@ -316,3 +316,26 @@ body[data-theme="warm"] .mail-row { background: var(--bg); }
 .card, .hero-art { color: #fff; }
 html:has(body[data-theme="warm"]) { background: #fff6ee; }
 @media (max-width: 719px) { .stats { gap: 6px 14px; } .stats dd { font-size: 17px; } .stats dt { font-size: 11px; } .hero-note { font-size: 12px; } }
+
+/* 등장인물 줄 */
+.cast { padding: 18px 0 2px; display: grid; gap: 14px; }
+.cast-row h3 { margin: 0 0 10px; font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--muted); }
+.cast-row ul { list-style: none; margin: 0; padding: 4px 2px 6px; display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none; }
+.cast-row ul::-webkit-scrollbar { display: none; }
+.cast-row li { flex: none; width: 76px; display: grid; justify-items: center; gap: 6px; }
+.cast-row img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); background: var(--panel); }
+.cast-row span { font-size: 13px; font-weight: 700; text-align: center; line-height: 1.2; word-break: keep-all; }
+body[data-theme="warm"] .cast-row img { border-radius: 28px; }
+@media print { .cast { display: none; } }
+
+/* 등장인물 줄 */
+.cast { padding: 18px 0 2px; display: grid; gap: 14px; }
+.cast-row h3 { margin: 0 0 10px; font-size: 13px; font-weight: 800; letter-spacing: .06em; color: var(--muted); }
+.cast-row ul { list-style: none; margin: 0; padding: 4px 4px 6px; display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none; }
+.cast-row ul::-webkit-scrollbar { display: none; }
+.cast-row li { flex: none; width: 76px; display: grid; justify-items: center; gap: 6px; }
+.cast-row img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); background: var(--panel); }
+.cast-row span { font-size: 13px; font-weight: 700; text-align: center; line-height: 1.2; word-break: keep-all; }
+body[data-theme="warm"] .cast-row img { border-radius: 28px; }
+@media print { .cast { display: none; } }
+.cast { grid-template-columns: minmax(0, 1fr); } .cast-row { min-width: 0; }

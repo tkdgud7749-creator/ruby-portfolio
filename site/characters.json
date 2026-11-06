@@ -1,0 +1,135 @@
+{
+  "liora": [
+    {
+      "name": "루비",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/ruby.webp"
+    },
+    {
+      "name": "스피넬",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/spinel.webp"
+    },
+    {
+      "name": "제이",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/jay.webp"
+    },
+    {
+      "name": "건",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/gun.webp"
+    },
+    {
+      "name": "민우",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/minwoo.webp"
+    },
+    {
+      "name": "해리",
+      "series": [
+        "해리, 내 뒤에 있어"
+      ],
+      "img": "chars/harry.webp"
+    },
+    {
+      "name": "말포이",
+      "series": [
+        "해리, 내 뒤에 있어"
+      ],
+      "img": "chars/malfoy.webp"
+    },
+    {
+      "name": "교수",
+      "series": [
+        "해리, 내 뒤에 있어"
+      ],
+      "img": "chars/professor.webp"
+    },
+    {
+      "name": "루루",
+      "series": [
+        "묘한 이야기"
+      ],
+      "img": "chars/lulu.webp"
+    },
+    {
+      "name": "스승",
+      "series": [
+        "묘한 이야기"
+      ],
+      "img": "chars/mentor.webp"
+    },
+    {
+      "name": "추격자",
+      "series": [
+        "UNCAGED"
+      ],
+      "img": "chars/chaser.webp"
+    },
+    {
+      "name": "단아",
+      "series": [],
+      "img": "chars/dana.webp"
+    },
+    {
+      "name": "은우",
+      "series": [],
+      "img": "chars/eunwoo.webp"
+    }
+  ],
+  "milo": [
+    {
+      "name": "밀로",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/milo.webp"
+    },
+    {
+      "name": "루나",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/luna.webp"
+    },
+    {
+      "name": "레오",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/leo.webp"
+    },
+    {
+      "name": "루나 라이벌",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/rival.webp"
+    },
+    {
+      "name": "악당",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/villain.webp"
+    },
+    {
+      "name": "아기 고양이",
+      "series": [
+        "전체"
+      ],
+      "img": "chars/kitten.webp"
+    }
+  ]
+}
