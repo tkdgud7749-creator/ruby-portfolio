@@ -171,7 +171,7 @@
     if (!history.state || !history.state.player) history.pushState({ player: true }, '', location.href);
     $('#ptitle').textContent = it.title || '';
     const bits = [];
-    if (it.views != null) bits.push(`조회수 ${fmt(it.views)}`);
+    if (it.views != null) bits.push(`조회수 ${fmt(it.views)}` + (it.fbViews ? ` (인스타 ${fmt(it.igViews || 0)} + 페이스북 ${fmt(it.fbViews)})` : ''));
     if (it.series) bits.push([it.series, epLabel(it)].filter(Boolean).join(' '));
     if (it.brand) bits.push(it.brand);
     setAspect(it.aspect || 0.5625);

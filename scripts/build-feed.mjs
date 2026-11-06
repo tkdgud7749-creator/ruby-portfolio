@@ -234,6 +234,37 @@ async function localThumb(it) {
   } catch (e) { log('썸네일 실패', it.id, e.message); return it.thumbSrc; }
 }
 
+
+// ---------- 페이스북 페이지 릴스 조회수 (인스타와 같은 영상이면 합산) ----------
+const capKey = (s) => String(s || '').replace(/https?:\/\/\S+/g, '').replace(/[#@][\p{L}\p{N}_.]+/gu, '').replace(/[^\p{L}\p{N}]/gu, '').toLowerCase().slice(0, 40);
+async function fetchPageVideos(ch) {
+  const fb = ch.facebook;
+  const name = fb?.reelsPage || fb?.pageName;
+  const token = process.env[fb?.tokenEnv || ch.instagram?.tokenEnv];
+  if (!name || !token) return null;
+  const list = await getJSON(`${FB}/me/accounts?fields=id,name,access_token&limit=100&access_token=${encodeURIComponent(token)}`);
+  const pg = (list.data || []).find((x) => x.name?.toLowerCase() === name.toLowerCase());
+  if (!pg) throw new Error(`페이지 '${name}'를 토큰에서 찾지 못함`);
+  const vids = [];
+  let url = `${FB}/${pg.id}/videos?fields=id,description,created_time,views&limit=100&access_token=${encodeURIComponent(pg.access_token)}`;
+  while (url && vids.length < 2000) { const page = await getJSON(url); vids.push(...(page.data || [])); url = page.paging?.next; }
+  return vids.map((v) => ({ id: v.id, key: capKey(v.description), t: Date.parse(v.created_time), views: v.views ?? 0 }));
+}
+function mergeFacebookViews(igItems, vids) {
+  const used = new Set();
+  let n = 0;
+  for (const it of igItems) {
+    const t = Date.parse(it.date), key = capKey(it.caption);
+    const near = vids.filter((v) => !used.has(v.id) && Math.abs(v.t - t) < 3 * 864e5);
+    let m = key.length >= 6 ? near.find((v) => v.key && (v.key.startsWith(key.slice(0, 20)) || key.startsWith(v.key.slice(0, 20)))) : null;
+    if (!m) { const close = near.filter((v) => Math.abs(v.t - t) < 30 * 6e4); if (close.length === 1) m = close[0]; }
+    it.igViews = it.views ?? null;
+    it.fbViews = m ? m.views : null;
+    if (m) { used.add(m.id); it.views = (it.views || 0) + m.views; n++; }
+  }
+  return n;
+}
+
 // ---------- main ----------
 await fs.mkdir(THUMBS, { recursive: true });
 const items = new Map();
@@ -248,6 +279,12 @@ for (const ch of channels) {
     let res = null;
     try { res = await fetchInstagram(ch); } catch (e) { log(`${ch.key} 인스타 실패: ${e.message} → 이전 데이터 유지`); }
     const old = prevItems.filter((i) => i.platform === 'instagram' && i.channel === ch.key && !i.id.startsWith('ig-link-'));
+    if (res && ch.facebook) {
+      try {
+        const vids = await fetchPageVideos(ch);
+        if (vids) log(`${ch.key}: 페이스북 릴스 ${vids.length}개 중 ${mergeFacebookViews(res.items, vids)}개를 인스타 조회수에 합산`);
+      } catch (e) { log(`${ch.key} 페이스북 릴스 조회수 실패`, e.message); }
+    }
     for (const it of res ? res.items : old) items.set(it.id, it);
     followers.push({ key: 'instagram', label: 'Instagram', url: `https://www.instagram.com/${res?.username || ch.instagram.handle}/`, count: res ? res.followers : prevCount(ch.key, 'instagram') });
   }
