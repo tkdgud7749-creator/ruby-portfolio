@@ -57,7 +57,8 @@
           "엔터테인먼트"
         ],
         "services": [],
-        "faq": []
+        "faq": [],
+        "model": "Seedance 2.5"
       },
       "theme": "dark"
     },
@@ -93,7 +94,8 @@
           "AI 툴"
         ],
         "services": [],
-        "faq": []
+        "faq": [],
+        "model": "Seedance 2.5"
       },
       "theme": "warm"
     }

@@ -16,12 +16,14 @@ const cfg = JSON.parse(await fs.readFile(path.join(ROOT, 'config.json'), 'utf8')
 const loaded = await fs.readFile(FEED, 'utf8').then(JSON.parse).catch(() => null);
 const prev = loaded && !loaded.demo && loaded.channels ? loaded : { items: [], channels: [] }; // 샘플·옛 형식은 이어받지 않는다
 const prevItems = prev.items || [];
-// 캡션에 적힌 제작 툴(예: "Made with higgsfield.ai", "#DomoAI")을 배지로
+// 캡션에 적힌 제작 플랫폼(예: "Made with higgsfield.ai", "#DomoAI")을 배지로.
+// 생성 모델(Seedance 등)은 플랫폼이 아니라서 넣지 않는다 — 모델은 config.json mediaKit.model 에 따로 적는다
 const TOOLS = [
-  ['Higgsfield', /higgsfield/i], ['DomoAI', /domo\s*ai|@domoai|#domo/i], ['Pollo AI', /pollo/i], ['Seedance', /seedance/i],
-  ['Dreamina', /dreamina/i], ['Kling', /kling/i], ['Hailuo', /hailuo|minimax/i], ['Runway', /runway/i], ['Veo', /\bveo\s*\d/i],
-  ['Sora', /\bsora\b/i], ['Midjourney', /midjourney/i], ['Nano Banana', /nano\s*banana/i], ['PixVerse', /pixverse/i], ['Vidu', /\bvidu\b/i],
+  ['Higgsfield', /higgsfield/i], ['DomoAI', /domo\s*ai|@domoai|#domo/i], ['Pollo AI', /pollo/i],
+  ['Dreamina', /dreamina/i], ['Kling', /kling/i], ['Hailuo', /hailuo|minimax/i], ['Runway', /runway/i],
+  ['PixVerse', /pixverse/i], ['Vidu', /\bvidu\b/i],
 ];
+const TOOL_NAMES = new Set(TOOLS.map(([n]) => n));
 const toolsOf = (text) => TOOLS.filter(([, re]) => re.test(String(text || ''))).map(([n]) => n);
 const prevCount = (ch, key) => (prev.channels.find((c) => c.key === ch)?.followers || []).find((f) => f.key === key)?.count ?? null;
 const channels = cfg.channels || [];
@@ -402,7 +404,7 @@ for (const it of items.values()) {
     // 다음 실행 때 계정 연결이 실패하면 이 값으로 이어 쓴다 (캡션 전체는 무거워서 저장하지 않음)
     _ad: it.caption != null ? isAd(it.caption) : Boolean(it._ad),
     _mention: it.caption != null ? firstMention(it.caption) : it._mention || null,
-    tools: it.caption != null ? toolsOf(it.caption) : it.tools || [],
+    tools: it.caption != null ? toolsOf(it.caption) : (it.tools || []).filter((n) => TOOL_NAMES.has(n)),
     code: it.code || undefined,
     thumbSrc: it.thumbSrc || undefined,
     _sheet: it.sheet || undefined,

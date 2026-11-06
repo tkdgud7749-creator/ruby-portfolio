@@ -25,7 +25,7 @@
       fitLabel: '이런 브랜드와 잘 맞아요', numbers: '숫자로 보는 채널', avgViews: '영상당 평균 조회수', sumOf: (n) => `영상 ${n}편 합계`,
       reach: '월간 도달', monthViews: '월간 조회수', inter: '월간 상호작용', last30: '최근 30일 · 인스타그램', interSub: '좋아요·댓글·저장·공유',
       audience: '누가 보나요', age: '연령', gender: '성별', disclosed: '(공개 기준)', country: '국가', F: '여성', M: '남성',
-      topWorks: '대표 작품', collabs: '브랜드 협업', withBrands: '함께한 브랜드', toolsUsed: '제작 툴', services: '제작 상품', process: '진행 과정',
+      topWorks: '대표 작품', collabs: '브랜드 협업', withBrands: '함께한 브랜드', toolsUsed: '제작 플랫폼', model: '생성 모델', services: '제작 상품', process: '진행 과정',
       steps: ['문의·브리프', '기획안 제안', '제작', '수정·컨펌', '발행·리포트'], faq: '자주 묻는 질문',
       ctaH: '함께 만들어 볼까요?', ctaP: '브랜드·제품 소개와 원하시는 일정만 보내 주세요.', pdf: 'PDF로 저장', src: '수치는 인스타그램 공식 API 기준',
       mainCast: '주요 인물', cast: '등장인물', shortCast: '단편 등장인물',
@@ -49,7 +49,7 @@
       fitLabel: 'A good fit for', numbers: 'Channel at a glance', avgViews: 'Avg. views per video', sumOf: (n) => `across ${n} videos`,
       reach: 'Monthly reach', monthViews: 'Monthly views', inter: 'Monthly interactions', last30: 'Last 30 days · Instagram', interSub: 'Likes, comments, saves, shares',
       audience: 'Audience', age: 'Age', gender: 'Gender', disclosed: '(disclosed)', country: 'Country', F: 'Female', M: 'Male',
-      topWorks: 'Top works', collabs: 'Brand collaborations', withBrands: 'Brands', toolsUsed: 'Tools', services: 'Packages', process: 'How we work',
+      topWorks: 'Top works', collabs: 'Brand collaborations', withBrands: 'Brands', toolsUsed: 'Platforms', model: 'Generation model', services: 'Packages', process: 'How we work',
       steps: ['Inquiry & brief', 'Proposal', 'Production', 'Revisions', 'Publish & report'], faq: 'FAQ',
       ctaH: "Let's make something together.", ctaP: 'Send us your brand, product and timeline.', pdf: 'Save as PDF', src: 'Figures from the official Instagram API',
       mainCast: 'Main cast', cast: 'Cast', shortCast: 'Other characters',
@@ -462,7 +462,7 @@
         ${fit.length ? `<p class="fit-label">${t('fitLabel')}</p><ul class="fit">${fit.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>` : ''}
       </div>
 
-      ${brands.length || tools.length ? `<div class="strips">${strip(t('withBrands'), brands)}${strip(t('toolsUsed'), tools)}</div>` : ''}
+      ${brands.length || tools.length || kit.model ? `<div class="strips">${strip(t('withBrands'), brands)}${strip(t('toolsUsed'), tools)}${strip(t('model'), kit.model ? [kit.model] : [])}</div>` : ''}
 
       <h3 class="sec">${t('numbers')}</h3>
       <div class="kpis">
