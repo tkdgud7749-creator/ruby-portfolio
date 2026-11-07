@@ -33,7 +33,12 @@ const log = (...a) => console.log('[feed]', ...a);
 async function getJSON(url, headers = {}) {
   const r = await fetch(url, { headers });
   const body = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(`${r.status} ${body?.error?.message || body?.title || ''}`.trim());
+  if (!r.ok) {
+    const e = body?.error;
+    // Meta 오류는 code·subcode가 있어야 원인(앱 제한·토큰 만료 등)을 알 수 있다
+    const meta = e ? [e.type, e.code && `code ${e.code}`, e.error_subcode && `sub ${e.error_subcode}`, e.error_user_title].filter(Boolean).join(' / ') : '';
+    throw new Error(`${r.status} ${e?.message || body?.title || ''}${meta ? ` (${meta})` : ''}`.trim());
+  }
   return body;
 }
 async function pool(arr, n, fn) {
