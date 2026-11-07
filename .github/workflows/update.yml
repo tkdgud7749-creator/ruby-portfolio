@@ -2,7 +2,7 @@ name: 영상 목록 갱신
 
 on:
   schedule:
-    - cron: '7 * * * *'   # 매시 7분
+    - cron: '17 */6 * * *'   # 6시간마다 (한국 시간 3·9·15·21시 17분) — 매시간 호출하면 Meta가 비정상 활동으로 막을 수 있다
   workflow_dispatch:       # Actions 탭에서 "지금 갱신" 버튼
   push:
     branches: [main]
