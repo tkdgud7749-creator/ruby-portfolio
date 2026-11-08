@@ -398,7 +398,8 @@ for (const it of items.values()) {
     title,
     thumb: await localThumb(it),
     video: it.video || null,
-    views: s.views ?? it.views ?? null,
+    // X 조회수는 인스타보다 훨씬 낮아 보여 주지 않는다 (2026-11-09 사용자 결정) — 시트 조회수 칸을 채워도 무시
+    views: it.platform === 'x' ? null : (s.views ?? it.views ?? null),
     aspect: it.aspect ?? (it.platform === 'instagram' ? 0.5625 : null),
     date: it.date || null,
     series: s.series || seriesFromTitle(title, ch) || null,
