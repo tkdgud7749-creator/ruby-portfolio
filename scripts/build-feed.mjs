@@ -74,6 +74,12 @@ function seriesFromTitle(title, ch) {
   if (ch?.episodeSeries && /^\s*(?:ep|episode)\s*\.?\s*\d+/i.test(String(title || ''))) return ch.episodeSeries;
   return null;
 }
+// 제목에 시리즈 이름이 없어도 캡션 해시태그(#TheCrimsonCheckmate 등)로 시리즈를 잡는다 — config seriesHashtags
+function seriesFromTags(caption, ch) {
+  const tags = (String(caption || '').match(/#[\p{L}\p{N}_]+/gu) || []).map((h) => norm(h.slice(1)));
+  for (const [name, list] of Object.entries(ch?.seriesHashtags || {})) if (list.some((k) => tags.includes(norm(k)))) return name;
+  return null;
+}
 function isAd(text) {
   const tags = (String(text || '').match(/#[\p{L}\p{N}_]+/gu) || []).map((h) => h.slice(1).toLowerCase());
   const adTags = (cfg.adHashtags || []).map((h) => h.toLowerCase());
@@ -402,7 +408,7 @@ for (const it of items.values()) {
     views: it.platform === 'x' ? null : (s.views ?? it.views ?? null),
     aspect: it.aspect ?? (it.platform === 'instagram' ? 0.5625 : null),
     date: it.date || null,
-    series: s.series || seriesFromTitle(title, ch) || null,
+    series: s.series || seriesFromTitle(title, ch) || seriesFromTags(it.caption, ch) || null,
     season: seasonOf(title),
     episode: episodeOf(title),
     ad: false,
