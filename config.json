@@ -54,12 +54,20 @@
       },
       "mediaKit": {
         "headline": "AI 영상 크리에이터, 리오라 솔베일입니다.",
+        "headlineEn": "I'm Liora Solveil, an AI film creator.",
         "intro": "참교육 액션, 좀비·재난, 연재형 시리즈까지 — 스토리가 있는 AI 숏폼으로 브랜드 메시지를 끝까지 보게 만듭니다.",
+        "introEn": "From payback action and zombie/disaster thrillers to ongoing series — story-driven AI short-form that keeps viewers watching your brand message to the very end.",
         "brands": [
           "AI 영상·이미지 툴",
           "앱·플랫폼",
           "게임",
           "엔터테인먼트"
+        ],
+        "brandsEn": [
+          "AI video & image tools",
+          "Apps & platforms",
+          "Games",
+          "Entertainment"
         ],
         "services": [],
         "faq": [],
@@ -96,12 +104,20 @@
       "episodeSeries": "Milo&Luna",
       "mediaKit": {
         "headline": "고양이 커플 Milo & Luna의 연재 숏폼입니다.",
+        "headlineEn": "Milo & Luna — an ongoing short-form series about a cat couple.",
         "intro": "매 화 이어지는 고양이 러브코미디 시리즈. 반려동물·라이프스타일 브랜드를 이야기 안에 자연스럽게 녹입니다.",
+        "introEn": "A cat romantic-comedy series that continues every episode, weaving pet and lifestyle brands naturally into the story.",
         "brands": [
           "반려동물 용품",
           "펫푸드",
           "라이프스타일",
           "AI 툴"
+        ],
+        "brandsEn": [
+          "Pet supplies",
+          "Pet food",
+          "Lifestyle",
+          "AI tools"
         ],
         "services": [],
         "faq": [],
