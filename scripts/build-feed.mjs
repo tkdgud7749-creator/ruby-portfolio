@@ -422,7 +422,8 @@ for (const it of items.values()) {
     _sheet: it.sheet || undefined,
   };
   item.ad = Boolean(s.ad) || item._ad;
-  if (item.ad) item.brand = s.brand || (item._mention ? '@' + item._mention : null);
+  // 브랜드: 시트 > 캡션 첫 @멘션 > 캡션에 나온 제작 플랫폼 이름 ("[광고] Dreamina에서..."처럼 멘션 없는 광고)
+  if (item.ad) item.brand = s.brand || (item._mention ? '@' + item._mention : null) || item.tools[0] || null;
   if (s.hide) item.hidden = true;
   out.push(item);
 }
